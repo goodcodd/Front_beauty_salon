@@ -17,7 +17,7 @@ import { handleBookCancelCallbackQuery } from "./commands/myBooking";
 export default (bot: TelegramBot) => {
   bot.onText(/\/start/, (msg) => startCommand(bot, msg));
   bot.onText(/\/services/, (msg) => servicesCommand(bot, msg));
-  bot.onText(/\/language/, (msg, match) => languageCommand(bot, msg, match));
+  bot.onText(/\/language/, (msg) => languageCommand(bot, msg));
   bot.onText(/\/book/, (msg) => bookCommand(bot, msg));
   bot.onText(/\/my_booking/, (msg) => myBookingCommand(bot, msg));
   bot.onText(/\/contacts/, (msg) => contactsCommand(bot, msg));

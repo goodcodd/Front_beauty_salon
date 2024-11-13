@@ -1,10 +1,11 @@
 {
   "name": "nastya_bot",
   "version": "1.0.0",
-  "main": "src/app.ts",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/app.ts",
-    "dev": "nodemon --watch src --exec ts-node src/app.ts",
+	  "build": "tsc",
+	  "start": "node dist/index.js",
+    "dev": "nodemon --watch src --exec ts-node src/index.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"

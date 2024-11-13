@@ -4,9 +4,9 @@ describe('UserState management', () => {
   it('should set user state', () => {
     const userId = 1;
     const userState = {
-      user: { id: 1, name: 'Test User' },
-      service: { id: 1, name: 'Service 1', duration: 30 },
-      master: { id: 1, name: 'Master 1' },
+      user: { id: 1, name: 'Test User', documentId: 'dsfsdf1' },
+      service: { id: 1, name: 'Service 1', duration: 30, documentId: 'dsfsdf2' },
+      master: { id: 1, name: 'Master 1', documentId: 'dsfsdf3' },
       date: '2024-10-12',
       time: '10:00',
     };
@@ -20,7 +20,7 @@ describe('UserState management', () => {
   it('should get user state', () => {
     const userId = 2;
     const userState = {
-      user: { id: 2, name: 'Test User 2' },
+      user: { id: 2, name: 'Test User 2', documentId: 'dsfsdf1' },
       service: null,
       master: null,
       date: '',
@@ -36,7 +36,7 @@ describe('UserState management', () => {
   it('should update user state partially', () => {
     const userId = 3;
     const initialUserState = {
-      user: { id: 3, name: 'Test User 3' },
+      user: { id: 3, name: 'Test User 3', documentId: 'dsfsdf1' },
       service: null,
       master: null,
       date: '',
@@ -46,7 +46,7 @@ describe('UserState management', () => {
     setUserState(userId, initialUserState);
     
     const partialUpdate = {
-      service: { id: 2, name: 'Service 2', duration: 45 },
+      service: { id: 2, name: 'Service 2', duration: 45, documentId: 'dsfsdf2' },
       date: '2024-10-13',
     };
     
@@ -65,7 +65,7 @@ describe('UserState management', () => {
   it('should not update state if user does not exist', () => {
     const userId = 4;
     const partialUpdate = {
-      service: { id: 3, name: 'Service 3', duration: 60 },
+      service: { id: 3, name: 'Service 3', duration: 60, documentId: 'dsfsdf1' },
     };
     
     updateUserState(userId, partialUpdate);

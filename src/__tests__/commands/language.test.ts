@@ -65,7 +65,7 @@ describe('languageCommand', () => {
   
   it('should send a message with language options', async () => {
     (i18n.t as unknown as jest.Mock).mockReturnValueOnce('Select your language');
-    await languageCommand(bot, msg, null);
+    await languageCommand(bot, msg);
     
     expect(bot.sendMessage).toHaveBeenCalledWith(12345, 'Select your language', {
       reply_markup: {
