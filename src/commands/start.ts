@@ -1,12 +1,16 @@
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 
 import i18n from '../config/i18n';
-import { setUserState } from "../state/userState";
-import customFetch from "../utils/customFetch";
+import { setUserState } from '../state/userState';
+import customFetch from '../utils/customFetch';
 
 const startCommand = async (bot: TelegramBot, msg: Message) => {
   const chatId = msg.chat.id;
-  const { id: telegramId, first_name: name = 'Guest', username = '' } = msg.from || {};
+  const {
+    id: telegramId,
+    first_name: name = 'Guest',
+    username = '',
+  } = msg.from || {};
 
   if (!telegramId) {
     await bot.sendMessage(chatId, i18n.t('telegramIdError'));
@@ -14,13 +18,17 @@ const startCommand = async (bot: TelegramBot, msg: Message) => {
   }
 
   try {
-    const { data: user } = await customFetch(`/telegram-users/telegramId/${telegramId}`);
+    const { data: user } = await customFetch(
+      `/telegram-users/telegramId/${telegramId}`,
+    );
     let userData = user;
 
     if (!userData) {
       const { data: newUser } = await customFetch('/telegram-users', {
         method: 'POST',
-        body: JSON.stringify({ data: { telegram_id: telegramId, name, username } }),
+        body: JSON.stringify({
+          data: { telegram_id: telegramId, name, username },
+        }),
       });
       userData = newUser;
     }
@@ -38,7 +46,7 @@ const startCommand = async (bot: TelegramBot, msg: Message) => {
 
     setUserState(chatId, initialState);
   } catch (error) {
-    console.error("Error adding user or sending welcome message:", error);
+    console.error('Error adding user or sending welcome message:', error);
     await bot.sendMessage(chatId, i18n.t('tryLaterError'));
   }
 };

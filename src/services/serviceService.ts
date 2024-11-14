@@ -2,17 +2,25 @@ import TelegramBot from 'node-telegram-bot-api';
 
 import { updateUserState } from '../state/userState';
 import { generateDateMenu, generateServiceMenu } from '../utils/menus';
-import i18n from "../config/i18n";
-import customFetch from "../utils/customFetch";
-import qs from "qs";
+import i18n from '../config/i18n';
+import customFetch from '../utils/customFetch';
+import qs from 'qs';
 
-export const fetchServiceById = async (serviceId: string, locale: string = 'en') => {
+export const fetchServiceById = async (
+  serviceId: string,
+  locale: string = 'en',
+) => {
   const { data } = await customFetch(`/services/${serviceId}?locale=${locale}`);
 
   return data;
 };
 
-export const handleServiceBookSelection = async (bot: TelegramBot, chatId: number, messageId: number, data: string) => {
+export const handleServiceBookSelection = async (
+  bot: TelegramBot,
+  chatId: number,
+  messageId: number,
+  data: string,
+) => {
   try {
     const serviceId = data.split('service_')[1];
     const service = await fetchServiceById(serviceId, i18n.language);
@@ -24,18 +32,25 @@ export const handleServiceBookSelection = async (bot: TelegramBot, chatId: numbe
 
     updateUserState(chatId, { service });
 
-    await bot.editMessageText(i18n.t('serviceSelected', { service: service.name }), {
-      chat_id: chatId,
-      message_id: messageId,
-      reply_markup: generateDateMenu().reply_markup,
-    });
+    await bot.editMessageText(
+      i18n.t('serviceSelected', { service: service.name }),
+      {
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: generateDateMenu().reply_markup,
+      },
+    );
   } catch (error) {
     console.error('Error handling service selection:', error);
     await bot.sendMessage(chatId, i18n.t('selectError'));
   }
 };
 
-export const handleBookService = async (bot: TelegramBot, chatId: number, messageId?: number) => {
+export const handleBookService = async (
+  bot: TelegramBot,
+  chatId: number,
+  messageId?: number,
+) => {
   try {
     await bot.sendChatAction(chatId, 'typing');
     const menu = await generateServiceMenu(i18n.language);
@@ -59,7 +74,7 @@ export const handleMasterService = async (bot: TelegramBot, chatId: number) => {
   try {
     const { data } = await customFetch(`/services?locale=${i18n.language}`);
 
-    const menu = data.map((service: { name: string, id: number }) => [
+    const menu = data.map((service: { name: string; id: number }) => [
       { text: service.name, callback_data: `masters_service_${service.id}` },
     ]);
 
@@ -74,7 +89,12 @@ export const handleMasterService = async (bot: TelegramBot, chatId: number) => {
   }
 };
 
-export const handleServiceMasterSelection = async (bot: TelegramBot, chatId: number, messageId: number, data: string) => {
+export const handleServiceMasterSelection = async (
+  bot: TelegramBot,
+  chatId: number,
+  messageId: number,
+  data: string,
+) => {
   try {
     const serviceId = data.split('masters_service_')[1];
     const service = await fetchServiceById(serviceId, i18n.language);
@@ -83,7 +103,7 @@ export const handleServiceMasterSelection = async (bot: TelegramBot, chatId: num
       await bot.sendMessage(chatId, i18n.t('serviceFoundError'));
       return;
     }
-    
+
     const body = qs.stringify({
       filters: {
         service: serviceId,
@@ -91,16 +111,22 @@ export const handleServiceMasterSelection = async (bot: TelegramBot, chatId: num
       locale: i18n.language,
     });
     const { data: masters } = await customFetch('/masters', { body });
-    const inlineKeyboard = masters
-      .map((master: { id: number, name: string }) => [{ text: master.name, callback_data: `masters_master_${master.id}` }]);
+    const inlineKeyboard = masters.map(
+      (master: { id: number; name: string }) => [
+        { text: master.name, callback_data: `masters_master_${master.id}` },
+      ],
+    );
 
-    await bot.editMessageText(i18n.t('master.serviceSelected', { service: service.name }), {
-      chat_id: chatId,
-      message_id: messageId,
-      reply_markup: {
-        inline_keyboard: inlineKeyboard,
+    await bot.editMessageText(
+      i18n.t('master.serviceSelected', { service: service.name }),
+      {
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: {
+          inline_keyboard: inlineKeyboard,
+        },
       },
-    });
+    );
   } catch (error) {
     console.error('Error handling service selection:', error);
     await bot.sendMessage(chatId, i18n.t('selectError'));

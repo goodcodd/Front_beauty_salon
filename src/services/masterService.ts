@@ -1,18 +1,26 @@
-import TelegramBot from "node-telegram-bot-api";
+import TelegramBot from 'node-telegram-bot-api';
 
-import { getUserState, updateUserState } from "../state/userState";
-import i18n from "../config/i18n";
-import { generateMasterMenu, generateTimeMenu } from "../utils/menus";
-import getMockMasters from "../mocks/masters";
-import customFetch from "../utils/customFetch";
+import { getUserState, updateUserState } from '../state/userState';
+import i18n from '../config/i18n';
+import { generateMasterMenu, generateTimeMenu } from '../utils/menus';
+import getMockMasters from '../mocks/masters';
+import customFetch from '../utils/customFetch';
 
-export const fetchMasterById = async (masterId: string, locale: string = 'en') => {
+export const fetchMasterById = async (
+  masterId: string,
+  locale: string = 'en',
+) => {
   const { data } = await customFetch(`/masters/${masterId}?locale=${locale}`);
 
   return data;
 };
 
-export const handleMasterSelection = async (bot: TelegramBot, chatId: number, messageId: number, data: string) => {
+export const handleMasterSelection = async (
+  bot: TelegramBot,
+  chatId: number,
+  messageId: number,
+  data: string,
+) => {
   try {
     const userState = getUserState(chatId);
 
@@ -31,18 +39,25 @@ export const handleMasterSelection = async (bot: TelegramBot, chatId: number, me
 
     updateUserState(chatId, { master });
 
-    await bot.editMessageText(i18n.t('masterSelected', { master: master.name }), {
-      chat_id: chatId,
-      message_id: messageId,
-      reply_markup: generateTimeMenu(userState.service.duration).reply_markup,
-    });
+    await bot.editMessageText(
+      i18n.t('masterSelected', { master: master.name }),
+      {
+        chat_id: chatId,
+        message_id: messageId,
+        reply_markup: generateTimeMenu(userState.service.duration).reply_markup,
+      },
+    );
   } catch (error) {
     console.error('Error handling master selection:', error);
     await bot.sendMessage(chatId, i18n.t('selectError'));
   }
 };
 
-export const handleBackToMaster = async  (bot: TelegramBot, chatId: number, messageId: number) => {
+export const handleBackToMaster = async (
+  bot: TelegramBot,
+  chatId: number,
+  messageId: number,
+) => {
   const userState = getUserState(chatId);
 
   if (!userState?.service) {
@@ -50,7 +65,11 @@ export const handleBackToMaster = async  (bot: TelegramBot, chatId: number, mess
     return;
   }
 
-  const menu = await generateMasterMenu(userState.service.id, true, i18n.language);
+  const menu = await generateMasterMenu(
+    userState.service.id,
+    true,
+    i18n.language,
+  );
 
   await bot.editMessageText(i18n.t('dateSelected', { date: userState.date }), {
     chat_id: chatId,
@@ -59,7 +78,12 @@ export const handleBackToMaster = async  (bot: TelegramBot, chatId: number, mess
   });
 };
 
-export const handleMasterMasterSelection = async (bot: TelegramBot, chatId: number, messageId: number, data: string) => {
+export const handleMasterMasterSelection = async (
+  bot: TelegramBot,
+  chatId: number,
+  messageId: number,
+  data: string,
+) => {
   try {
     const masterId = data.split('masters_master_')[1];
     const master = await fetchMasterById(masterId, i18n.language);
@@ -70,11 +94,17 @@ export const handleMasterMasterSelection = async (bot: TelegramBot, chatId: numb
     }
 
     const mockMasters = getMockMasters();
-    const mockData = mockMasters
-      .find((master) => master.masterId === masterId)!;
+    const mockData = mockMasters.find(
+      (master) => master.masterId === masterId,
+    )!;
 
     await bot.deleteMessage(chatId, messageId);
-    await bot.sendPhoto(chatId, mockData.imagePath, { caption: mockData?.caption }, { contentType: 'image/png' });
+    await bot.sendPhoto(
+      chatId,
+      mockData.imagePath,
+      { caption: mockData?.caption },
+      { contentType: 'image/png' },
+    );
   } catch (error) {
     console.error('Error handling master selection:', error);
     await bot.sendMessage(chatId, i18n.t('selectError'));

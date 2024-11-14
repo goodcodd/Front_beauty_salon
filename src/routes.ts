@@ -9,10 +9,10 @@ import {
   mastersCommand,
   myBookingCommand,
 } from './commands';
-import { handleMatersCallbackQuery } from "./commands/masters";
-import { handleBookCallbackQuery } from "./commands/book";
-import { handleLanguageCallbackQuery } from "./commands/language";
-import { handleBookCancelCallbackQuery } from "./commands/myBooking";
+import { handleMatersCallbackQuery } from './commands/masters';
+import { handleBookCallbackQuery } from './commands/book';
+import { handleLanguageCallbackQuery } from './commands/language';
+import { handleBookCancelCallbackQuery } from './commands/myBooking';
 
 export default (bot: TelegramBot) => {
   bot.onText(/\/start/, (msg) => startCommand(bot, msg));

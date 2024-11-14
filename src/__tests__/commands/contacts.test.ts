@@ -11,7 +11,7 @@ jest.mock('../../config/i18n', () => ({
 describe('contactsCommand', () => {
   let bot: jest.Mocked<TelegramBot>;
   let msg: Message;
-  
+
   beforeEach(() => {
     bot = {
       sendMessage: jest.fn(),
@@ -21,7 +21,7 @@ describe('contactsCommand', () => {
       chat: { id: 12345 },
     } as Message;
   });
-  
+
   it('should send contact information message', async () => {
     await contactsCommand(bot, msg);
 
@@ -31,13 +31,21 @@ describe('contactsCommand', () => {
       phone: contacts.phone,
       email: contacts.email,
     });
-    expect(bot.sendMessage).toHaveBeenCalledWith(msg.chat.id, 'Contact information');
+    expect(bot.sendMessage).toHaveBeenCalledWith(
+      msg.chat.id,
+      'Contact information',
+    );
   });
-  
+
   it('should handle errors in sendMessage gracefully', async () => {
     bot.sendMessage.mockRejectedValueOnce(new Error('Failed to send message'));
 
-    await expect(contactsCommand(bot, msg)).rejects.toThrow('Failed to send message');
-    expect(bot.sendMessage).toHaveBeenCalledWith(msg.chat.id, 'Contact information');
+    await expect(contactsCommand(bot, msg)).rejects.toThrow(
+      'Failed to send message',
+    );
+    expect(bot.sendMessage).toHaveBeenCalledWith(
+      msg.chat.id,
+      'Contact information',
+    );
   });
 });

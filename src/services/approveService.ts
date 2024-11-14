@@ -1,11 +1,15 @@
-import TelegramBot from "node-telegram-bot-api";
-import moment from "moment/moment";
+import TelegramBot from 'node-telegram-bot-api';
+import moment from 'moment/moment';
 
-import { getUserState } from "../state/userState";
-import i18n from "../config/i18n";
-import customFetch from "../utils/customFetch";
+import { getUserState } from '../state/userState';
+import i18n from '../config/i18n';
+import customFetch from '../utils/customFetch';
 
-export const handleSigningSelection = async (bot: TelegramBot, chatId: number, messageId: number) => {
+export const handleSigningSelection = async (
+  bot: TelegramBot,
+  chatId: number,
+  messageId: number,
+) => {
   const userState = getUserState(chatId);
 
   if (!userState) {
@@ -23,13 +27,18 @@ export const handleSigningSelection = async (bot: TelegramBot, chatId: number, m
   const datetime = moment(`${date} ${time}`, 'DD-MM-YYYY HH:mm').toISOString();
 
   try {
-    const isAvailable = await customFetch(`/bookings/available?masterId=${master.id}&datetime=${datetime}`);
+    const isAvailable = await customFetch(
+      `/bookings/available?masterId=${master.id}&datetime=${datetime}`,
+    );
 
     if (!isAvailable) {
-      await bot.sendMessage(chatId, i18n.t('masterAlreadyBooked', { master: master.name, date, time }));
+      await bot.sendMessage(
+        chatId,
+        i18n.t('masterAlreadyBooked', { master: master.name, date, time }),
+      );
       return;
     }
-    console.log(service, user, date, master, time)
+    console.log(service, user, date, master, time);
     const { data, error } = await customFetch(`/bookings`, {
       method: 'POST',
       body: JSON.stringify({
@@ -39,16 +48,24 @@ export const handleSigningSelection = async (bot: TelegramBot, chatId: number, m
           service: service.documentId,
           master: master.documentId,
           datetime,
-        }
+        },
       }),
     });
     console.log('error', error);
     if (!data) {
       await bot.sendMessage(chatId, i18n.t('appointmentError'));
-      return
+      return;
     }
     await bot.deleteMessage(chatId, messageId);
-    await bot.sendMessage(chatId, i18n.t('appointmentConfirmed', { service: service.name, master: master.name, date, time }));
+    await bot.sendMessage(
+      chatId,
+      i18n.t('appointmentConfirmed', {
+        service: service.name,
+        master: master.name,
+        date,
+        time,
+      }),
+    );
   } catch (error) {
     console.log('error', error);
     await bot.sendMessage(chatId, i18n.t('appointmentError'));

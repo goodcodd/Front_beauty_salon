@@ -1,9 +1,15 @@
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 
-import { handleMasterService, handleServiceMasterSelection } from "../services/serviceService";
-import { handleMasterMasterSelection } from "../services/masterService";
+import {
+  handleMasterService,
+  handleServiceMasterSelection,
+} from '../services/serviceService';
+import { handleMasterMasterSelection } from '../services/masterService';
 
-export const handleMatersCallbackQuery = async (bot: TelegramBot, callbackQuery: TelegramBot.CallbackQuery) => {
+export const handleMatersCallbackQuery = async (
+  bot: TelegramBot,
+  callbackQuery: TelegramBot.CallbackQuery,
+) => {
   const chatId = callbackQuery.message?.chat.id;
   const messageId = callbackQuery.message?.message_id;
   const data = callbackQuery.data;
@@ -13,7 +19,7 @@ export const handleMatersCallbackQuery = async (bot: TelegramBot, callbackQuery:
   if (data.startsWith('masters_service_')) {
     await handleServiceMasterSelection(bot, chatId, messageId, data);
   } else if (data.startsWith('masters_master_')) {
-    await handleMasterMasterSelection(bot, chatId, messageId, data)
+    await handleMasterMasterSelection(bot, chatId, messageId, data);
   }
 };
 

@@ -1,14 +1,23 @@
 import TelegramBot, { Message } from 'node-telegram-bot-api';
 
-import { handleBookService, handleServiceBookSelection } from "../services/serviceService";
-import { handleBackToDate, handleDateSelection } from "../services/dateService";
-import { handleBackToMaster, handleMasterSelection } from "../services/masterService";
-import { handleTimeSelection, handleBackToTime } from "../services/timeService";
-import { handleSigningSelection } from "../services/approveService";
-import customFetch from "../utils/customFetch";
-import { setUserState } from "../state/userState";
+import {
+  handleBookService,
+  handleServiceBookSelection,
+} from '../services/serviceService';
+import { handleBackToDate, handleDateSelection } from '../services/dateService';
+import {
+  handleBackToMaster,
+  handleMasterSelection,
+} from '../services/masterService';
+import { handleTimeSelection, handleBackToTime } from '../services/timeService';
+import { handleSigningSelection } from '../services/approveService';
+import customFetch from '../utils/customFetch';
+import { setUserState } from '../state/userState';
 
-export const handleBookCallbackQuery = async (bot: TelegramBot, callbackQuery: TelegramBot.CallbackQuery) => {
+export const handleBookCallbackQuery = async (
+  bot: TelegramBot,
+  callbackQuery: TelegramBot.CallbackQuery,
+) => {
   const chatId = callbackQuery.message?.chat.id;
   const messageId = callbackQuery.message?.message_id;
   const data = callbackQuery.data;
@@ -20,7 +29,7 @@ export const handleBookCallbackQuery = async (bot: TelegramBot, callbackQuery: T
   if (data.startsWith('service_')) {
     await handleServiceBookSelection(bot, chatId, messageId, data);
   } else if (data === 'back_to_service') {
-    await handleBookService(bot, chatId, messageId)
+    await handleBookService(bot, chatId, messageId);
   } else if (data.startsWith('date_')) {
     await handleDateSelection(bot, chatId, messageId, data);
   } else if (data === 'back_to_date') {
@@ -34,9 +43,19 @@ export const handleBookCallbackQuery = async (bot: TelegramBot, callbackQuery: T
   } else if (data.startsWith('back_to_time')) {
     await handleBackToTime(bot, chatId, messageId);
   } else if (data.startsWith('next_week_')) {
-    await handleBackToDate(bot, chatId, messageId, parseInt(data.split('_')[2]))
+    await handleBackToDate(
+      bot,
+      chatId,
+      messageId,
+      parseInt(data.split('_')[2]),
+    );
   } else if (data.startsWith('prev_week_')) {
-    await handleBackToDate(bot, chatId, messageId, parseInt(data.split('_')[2]))
+    await handleBackToDate(
+      bot,
+      chatId,
+      messageId,
+      parseInt(data.split('_')[2]),
+    );
   } else if (data === 'book_approve') {
     await handleSigningSelection(bot, chatId, messageId);
   }
@@ -48,7 +67,9 @@ const bookCommand = async (bot: TelegramBot, msg: Message) => {
 
   if (telegramId) {
     try {
-      const { data: user } = await customFetch('/telegram-users/telegramId/' + telegramId);
+      const { data: user } = await customFetch(
+        '/telegram-users/telegramId/' + telegramId,
+      );
       const initialState = {
         user,
         service: null,

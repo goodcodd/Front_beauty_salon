@@ -1,7 +1,12 @@
 interface UserState {
-  user: { id: number; name: string, documentId: string };
-  service: { id: number; name: string, duration: number, documentId: string } | null;
-  master: { id: number; name: string, documentId: string } | null;
+  user: { id: number; name: string; documentId: string };
+  service: {
+    id: number;
+    name: string;
+    duration: number;
+    documentId: string;
+  } | null;
+  master: { id: number; name: string; documentId: string } | null;
   date: string;
   time: string;
 }
@@ -16,7 +21,10 @@ export const getUserState = (userId: number) => {
   return userStates.get(userId);
 };
 
-export const updateUserState = (userId: number, partialState: Partial<UserState>) => {
+export const updateUserState = (
+  userId: number,
+  partialState: Partial<UserState>,
+) => {
   const currentState = userStates.get(userId);
   if (currentState) {
     const updatedState = { ...currentState, ...partialState };

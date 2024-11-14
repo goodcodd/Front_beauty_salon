@@ -4,17 +4,15 @@ import path from 'path';
 
 const rootDir = path.resolve(__dirname, '..');
 
-i18n
-  .use(Backend)
-  .init({
-    fallbackLng: 'en',
-    lng: 'en',
-    backend: {
-      loadPath: path.join(rootDir, 'locales', '{{lng}}', 'translation.json')
-    },
-    interpolation: {
-      escapeValue: false
-    }
-  });
+i18n.use(Backend).init({
+  fallbackLng: 'en',
+  lng: 'en',
+  backend: {
+    loadPath: path.join(rootDir, 'locales', '{{lng}}', 'translation.json'),
+  },
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export default i18n;

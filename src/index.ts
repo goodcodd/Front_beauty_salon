@@ -1,15 +1,13 @@
 import TelegramBot from 'node-telegram-bot-api';
-import express from 'express';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import { VercelRequest, VercelResponse } from '@vercel/node';
 
 import routes from './routes';
+import { development, production } from './core';
 
-const bot = new TelegramBot(process.env.BOT_TOKEN || '', { polling: true });
-const app = express();
+const BOT_TOKEN = process.env.BOT_TOKEN || '';
+const ENVIRONMENT = process.env.NODE_ENV || '';
 
-app.use(express.json());
+const bot = new TelegramBot(BOT_TOKEN);
 
 bot.setMyCommands([
   { command: '/start', description: 'start' },
@@ -18,23 +16,17 @@ bot.setMyCommands([
   { command: '/services', description: 'Price list for services' },
   { command: '/masters', description: 'List info about masters' },
   { command: '/language', description: 'Change the language' },
-  { command: '/contacts', description: 'Get salon working hours, address, and contact details' },
+  {
+    command: '/contacts',
+    description: 'Get salon working hours, address, and contact details',
+  },
 ]);
 
 routes(bot);
 
-app.get('/', (req, res) => {
-  res.send('Привет, Vercel с TypeScript!');
-});
-
-app.post(`/bot${process.env.BOT_TOKEN}`, (req, res) => {
-  bot.processUpdate(req.body);
-  res.sendStatus(200);
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Сервер запущен на порту ${PORT}`);
-});
-
-export default bot;
+//prod mode (Vercel)
+export const startVercel = async (req: VercelRequest, res: VercelResponse) => {
+  await production(req, res, bot);
+};
+//dev mode
+ENVIRONMENT !== 'production' && development(bot);

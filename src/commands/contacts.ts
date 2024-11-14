@@ -9,9 +9,9 @@ const contactsCommand = async (bot: TelegramBot, msg: Message) => {
     schedule: contacts.schedule,
     address: contacts.address,
     phone: contacts.phone,
-    email: contacts.email
+    email: contacts.email,
   });
-  
+
   await bot.sendMessage(chatId, contactInfo);
 };
 

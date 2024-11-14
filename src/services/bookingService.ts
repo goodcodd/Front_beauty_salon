@@ -1,11 +1,15 @@
-import TelegramBot from "node-telegram-bot-api";
+import TelegramBot from 'node-telegram-bot-api';
 
-import i18n from "../config/i18n";
-import customFetch from "../utils/customFetch";
+import i18n from '../config/i18n';
+import customFetch from '../utils/customFetch';
 
 export const cancelBooking = async (bookingId: string): Promise<boolean> => {
   try {
-    const { data } = await customFetch(`/bookings/${bookingId}`, { method: 'DELETE' });
+    const { data, ...rest } = await customFetch(`/bookings/${bookingId}`, {
+      method: 'DELETE',
+    });
+    console.log('data', data);
+    console.log('rest', rest);
     return data;
   } catch (error) {
     console.error('Error cancelling booking:', error);
@@ -13,7 +17,10 @@ export const cancelBooking = async (bookingId: string): Promise<boolean> => {
   }
 };
 
-export const handleCancelBooking = async (bot: TelegramBot, callbackQuery: TelegramBot.CallbackQuery) => {
+export const handleCancelBooking = async (
+  bot: TelegramBot,
+  callbackQuery: TelegramBot.CallbackQuery,
+) => {
   const chatId = callbackQuery.message?.chat.id!;
   const messageId = callbackQuery.message?.message_id!;
   const data = callbackQuery.data!;
@@ -22,7 +29,7 @@ export const handleCancelBooking = async (bot: TelegramBot, callbackQuery: Teleg
 
   try {
     const result = await cancelBooking(bookingId);
-    
+
     if (result) {
       await bot.editMessageText(i18n.t('booking.canceled'), {
         chat_id: chatId,
