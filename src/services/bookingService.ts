@@ -5,11 +5,10 @@ import customFetch from '../utils/customFetch';
 
 export const cancelBooking = async (bookingId: string): Promise<boolean> => {
   try {
-    const { data, ...rest } = await customFetch(`/bookings/${bookingId}`, {
+    const { data } = await customFetch(`/bookings/${bookingId}`, {
       method: 'DELETE',
     });
-    console.log('data', data);
-    console.log('rest', rest);
+
     return data;
   } catch (error) {
     console.error('Error cancelling booking:', error);

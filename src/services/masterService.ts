@@ -3,14 +3,38 @@ import TelegramBot from 'node-telegram-bot-api';
 import { getUserState, updateUserState } from '../state/userState';
 import i18n from '../config/i18n';
 import { generateMasterMenu, generateTimeMenu } from '../utils/menus';
-import getMockMasters from '../mocks/masters';
 import customFetch from '../utils/customFetch';
+import qs from 'qs';
+
+const parseMasterPhoto = async (url: string) => {
+  try {
+    const photoUrl = `${process.env.API_BASE}${url}`;
+    const response = await fetch(photoUrl);
+    console.log('photoUrl', photoUrl);
+    console.log('response', response);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+    
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer)
+  } catch (error) {
+    console.error('Error sending photo to Telegram:', error);
+  }
+};
 
 export const fetchMasterById = async (
   masterId: string,
   locale: string = 'en',
 ) => {
-  const { data } = await customFetch(`/masters/${masterId}?locale=${locale}`);
+  const str = qs.stringify(
+    {
+      populate: ['photo'],
+      locale,
+    },
+    { addQueryPrefix: true },
+  );
+  const { data } = await customFetch(`/masters/${masterId}${str}`);
 
   return data;
 };
@@ -92,19 +116,16 @@ export const handleMasterMasterSelection = async (
       await bot.sendMessage(chatId, i18n.t('masterFoundError'));
       return;
     }
-
-    const mockMasters = getMockMasters();
-    const mockData = mockMasters.find(
-      (master) => master.masterId === masterId,
-    )!;
-
-    await bot.deleteMessage(chatId, messageId);
-    await bot.sendPhoto(
-      chatId,
-      mockData.imagePath,
-      { caption: mockData?.caption },
-      { contentType: 'image/png' },
-    );
+    const photo = await parseMasterPhoto(master.photo.url);
+    if (photo) {
+      await bot.deleteMessage(chatId, messageId);
+      await bot.sendPhoto(
+        chatId,
+        photo,
+        { caption: master.description },
+        { contentType: master.photo.mime },
+      );
+    }
   } catch (error) {
     console.error('Error handling master selection:', error);
     await bot.sendMessage(chatId, i18n.t('selectError'));

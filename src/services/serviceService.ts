@@ -74,8 +74,8 @@ export const handleMasterService = async (bot: TelegramBot, chatId: number) => {
   try {
     const { data } = await customFetch(`/services?locale=${i18n.language}`);
 
-    const menu = data.map((service: { name: string; id: number }) => [
-      { text: service.name, callback_data: `masters_service_${service.id}` },
+    const menu = data.map((service: { name: string; documentId: number }) => [
+      { text: service.name, callback_data: `masters_service_${service.documentId}` },
     ]);
 
     await bot.sendMessage(chatId, i18n.t('selectService'), {
@@ -97,23 +97,28 @@ export const handleServiceMasterSelection = async (
 ) => {
   try {
     const serviceId = data.split('masters_service_')[1];
+
     const service = await fetchServiceById(serviceId, i18n.language);
 
     if (!service) {
       await bot.sendMessage(chatId, i18n.t('serviceFoundError'));
       return;
     }
-
-    const body = qs.stringify({
-      filters: {
-        service: serviceId,
+    
+    const str = qs.stringify(
+      {
+        filters: {
+          service: service.id,
+        },
+        locale: i18n.language,
       },
-      locale: i18n.language,
-    });
-    const { data: masters } = await customFetch('/masters', { body });
+      { addQueryPrefix: true },
+    );
+    const { data: masters } = await customFetch(`/masters${str}`);
+
     const inlineKeyboard = masters.map(
-      (master: { id: number; name: string }) => [
-        { text: master.name, callback_data: `masters_master_${master.id}` },
+      (master: { documentId: number; name: string }) => [
+        { text: master.name, callback_data: `masters_master_${master.documentId}` },
       ],
     );
 

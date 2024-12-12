@@ -59,7 +59,6 @@ export const generateMasterMenu = async (
       },
     };
   } catch (error) {
-    console.log('error', error);
     return { reply_markup: { inline_keyboard: [] } };
   }
 };

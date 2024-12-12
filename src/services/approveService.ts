@@ -38,7 +38,7 @@ export const handleSigningSelection = async (
       );
       return;
     }
-    console.log(service, user, date, master, time);
+
     const { data, error } = await customFetch(`/bookings`, {
       method: 'POST',
       body: JSON.stringify({
@@ -51,7 +51,7 @@ export const handleSigningSelection = async (
         },
       }),
     });
-    console.log('error', error);
+
     if (!data) {
       await bot.sendMessage(chatId, i18n.t('appointmentError'));
       return;
@@ -67,7 +67,6 @@ export const handleSigningSelection = async (
       }),
     );
   } catch (error) {
-    console.log('error', error);
     await bot.sendMessage(chatId, i18n.t('appointmentError'));
   }
 };
